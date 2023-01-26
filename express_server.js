@@ -41,6 +41,12 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 })
 
+// Logout and clear username cookie
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect("/urls");
+})
+
 // Get /urls/new -> New Short URL page
 app.get("/urls/new", (req, res) => {
   const templateVars = {

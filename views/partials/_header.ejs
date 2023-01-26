@@ -21,19 +21,18 @@
     <% if (!username) { %>
       <form class="form-center" action="/login" method="POST">
         <div class="form-group mb-2">
-          <label for="username">Username:</label>
           <input
           class="form-center"
           type="text"
           name="username"
-          placeholder=""
+          placeholder="username"
           style="width: 300px; margin: 1em"
           />
           <button type="submit" class="btn btn-primary">Login</button>
         </div>
       </form>
     <% } else { %>
-      <a><%= username %></a>
+      <a>Logged in as: <%= username %></a>
       <form method="POST" action="/logout"> 
         <button type="submit" class="btn btn-primary">Logout</button>
       </form>
