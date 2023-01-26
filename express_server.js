@@ -25,6 +25,13 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// Create cookie to save login username
+app.post("/login", (req, res) => {
+  const username = req.body
+  res.cookie('username', username); 
+  res.redirect("/urls");
+})
+
 // Render New Short URL page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
