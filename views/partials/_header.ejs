@@ -18,7 +18,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <form class="form-center" action="/login" method="POST"> <!-- Does action need to route to specific shorURL? -->
+    <form class="form-center" action="/login" method="POST">
       <div class="form-group mb-2">
         <label for="username">Username:</label>
         <input
@@ -31,5 +31,6 @@
         <button type="submit" class="btn btn-primary">Login</button>
       </div>
     </form>
+    <a><%= username %></a>
   </nav>
 </header>
