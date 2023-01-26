@@ -45,6 +45,11 @@ app.get("/u/:id", (req, res) => {
   res.redirect(302, `${longURL}`);
 })
 
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id]
+  res.redirect(302, "/urls");
+})
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
