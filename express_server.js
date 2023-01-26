@@ -42,12 +42,20 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[`${req.params.id}`];
-  res.redirect(302, `${longURL}`);
+  res.redirect(longURL);
+})
+
+// Update URL
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  urlDatabase[id] = req.body.longURL; 
+  console.log(urlDatabase);
+  res.redirect("/urls") // this is creating a whole new short URL somehow
 })
 
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]
-  res.redirect(302, "/urls");
+  res.redirect("/urls");
 })
 
 app.get("/urls.json", (req, res) => {
