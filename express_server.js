@@ -19,15 +19,18 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// Render My URLs page
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
 
+// Render New Short URL page
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 })
 
+// Generate short URL and redirect to short URL page
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const shortURL = generateRandomString();
@@ -35,24 +38,27 @@ app.post("/urls", (req, res) => {
   res.redirect(302, `/urls/${shortURL}`);
 })
 
+// Render short URL page
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars)
 })
 
+// Use short URL to redirect to corresponding long URL webpage
 app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[`${req.params.id}`];
   res.redirect(longURL);
 })
 
-// Update URL
+// Update short URL to correspond to a different long URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   urlDatabase[id] = req.body.longURL; 
   console.log(urlDatabase);
-  res.redirect("/urls") // this is creating a whole new short URL somehow
+  res.redirect("/urls") 
 })
 
+// Delete short URL
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id]
   res.redirect("/urls");
