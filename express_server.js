@@ -40,6 +40,11 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars)
 })
 
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[`${req.params.id}`];
+  res.redirect(302, `${longURL}`);
+})
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
