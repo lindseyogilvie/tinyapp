@@ -176,7 +176,7 @@ app.get("/urls/:id", (req, res) => {
 // Use short URL to redirect to corresponding long URL webpage
 app.get("/u/:id", (req, res) => {
   // If short URL does not exist, return status code 400 - Bad Request
-  if (!req.params.id) {
+  if (!urlDatabase[req.params.id]) {
     res.status(400).send("Short URL does not exist");
   } else {
     const longURL = urlDatabase[`${req.params.id}`];
