@@ -39,8 +39,14 @@ const getUserByEmail = function(email) {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 // Get /
@@ -157,7 +163,7 @@ app.post("/urls", (req, res) => {
     return res.status(401).send("You must be logged in to see this page");
   } else {
     const shortURL = generateRandomString();
-    urlDatabase[shortURL] = req.body.longURL;
+    urlDatabase[shortURL].longURL = req.body.longURL;
     res.redirect(302, `/urls/${shortURL}`);
   }
 });
@@ -167,7 +173,7 @@ app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user,
   };
   res.render("urls_show", templateVars);
@@ -179,7 +185,7 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(400).send("Short URL does not exist");
   } else {
-    const longURL = urlDatabase[`${req.params.id}`];
+    const longURL = urlDatabase[`${req.params.id}`].longURL;
     res.redirect(longURL);
   }
 });
@@ -187,7 +193,7 @@ app.get("/u/:id", (req, res) => {
 // Update short URL to correspond to a different long URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
