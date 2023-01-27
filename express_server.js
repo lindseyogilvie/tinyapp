@@ -17,8 +17,8 @@ const generateRandomString = function() {
 
 // Users database object
 const users = {
-  userRandomID: {
-    id: "userRandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
@@ -45,8 +45,23 @@ const urlDatabase = {
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
+    userID: "aJ48lU",
+  },
+  i7H4F3: {
+    longURL: "https://www.apple.ca",
     userID: "aJ48lW",
   },
+};
+
+const urlsForUser = function(id) {
+  const userUrls = {};
+  for (const urls in urlDatabase) {
+    const url = urlDatabase[urls];
+    if (url.userID === id) {
+      userUrls[urls] = url;
+    }
+  }
+  return userUrls;
 };
 
 // Get /
@@ -106,10 +121,16 @@ app.get("/login", (req, res) => {
 // Get /urls -> My URLs page
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  const userUrls = urlsForUser(user.id);
   const templateVars = {
-    urls: urlDatabase,
+    urls: userUrls,
     user,
   };
+  // User cannot see /urls page unless they are logged in
+  if (!user) {
+    return res.status(401).send("Please login to see urls");
+  }
+
   res.render("urls_index", templateVars);
 });
 
