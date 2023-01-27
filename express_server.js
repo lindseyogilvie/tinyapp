@@ -41,7 +41,11 @@ app.get("/", (req, res) => {
 
 // Get /register -> New user registration page
 app.get("/register", (req, res) => {
-  res.render("user_registration");
+  const user = users[req.cookies["user_id"]];
+  const templateVars = {
+    user,
+  };
+  res.render("user_registration", templateVars);
 });
 
 // Register new user and store in users object
@@ -68,7 +72,11 @@ app.post("/register", (req, res) => {
 
 // Get /login -> User login page
 app.get("/login", (req, res) => {
-  res.render("user_login");
+  const user = users[req.cookies["user_id"]];
+  const templateVars = {
+    user,
+  };
+  res.render("user_login", templateVars);
 });
 
 // Get /urls -> My URLs page

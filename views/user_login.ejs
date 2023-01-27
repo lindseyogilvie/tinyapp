@@ -17,8 +17,11 @@
     <title>TinyApp</title>
   </head>
   <body>
+    <header> 
+      <%- include('partials/_header')%>
+    </header>
     <main style="margin: 1em;">
-      <h3>User Login</h3>
+      <h3>Login</h3>
       <form class="form-inline" action="/login" method="POST">
         <div class="form-group mb-2">
           <label for="email">Email:</label>
@@ -26,7 +29,7 @@
             class="form-control"
             type="email"
             name="email"
-            placeholder="Enter your email address"
+            placeholder="Enter email"
             style="width: 300px; margin: 1em"
           />
           <label for="password">Password:</label>
@@ -34,7 +37,7 @@
             class="form-control"
             type="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="Enter password"
             style="width: 300px; margin: 1em"
           />
           <button type="submit" class="btn btn-primary">Login</button>
