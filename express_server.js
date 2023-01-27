@@ -45,7 +45,11 @@ app.get("/register", (req, res) => {
   const templateVars = {
     user,
   };
-  res.render("user_registration", templateVars);
+  if (user) {
+    res.redirect("/urls");
+  } else {
+    res.render("user_registration", templateVars);
+  }
 });
 
 // Register new user and store in users object
@@ -76,7 +80,11 @@ app.get("/login", (req, res) => {
   const templateVars = {
     user,
   };
-  res.render("user_login", templateVars);
+  if (user) {
+    res.redirect("/urls");
+  } else {
+    res.render("user_login", templateVars);
+  }
 });
 
 // Get /urls -> My URLs page
@@ -120,15 +128,23 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user,
   };
-  res.render("urls_new", templateVars);
+  if (!user) {
+    res.redirect("/login");
+  } else {
+    res.render("urls_new", templateVars);
+  }
 });
 
 // Generate short URL and redirect to short URL page
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(302, `/urls/${shortURL}`);
+  const user = users[req.cookies["user_id"]];
+  if (!user) {
+    return res.status(401).send("You must be logged in to see this page");
+  } else {
+    const shortURL = generateRandomString();
+    urlDatabase[shortURL] = req.body.longURL;
+    res.redirect(302, `/urls/${shortURL}`);
+  }
 });
 
 // Get /urls/:id -> short URL page
