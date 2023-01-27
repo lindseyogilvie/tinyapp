@@ -81,7 +81,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// Create cookie to save login username
+// Login and create cookie
 app.post("/login", (req, res) => {
   for (let userID in users) {
     // If the email does not exist, return error 
@@ -100,10 +100,10 @@ app.post("/login", (req, res) => {
   }
 });
 
-// Logout and clear username cookie
+// Logout and clear user_id cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
-  res.redirect("/urls");
+  res.clearCookie('user_id');
+  res.redirect("/login");
 });
 
 // Get /urls/new -> New Short URL page
