@@ -29,6 +29,15 @@ const users = {
   },
 };
 
+const getUserByEmail = function(email) {
+  for (const id in users) {
+    const user = users[id];
+    if (user.email === email) {
+      return user;
+    }
+  }
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -80,6 +89,7 @@ app.get("/login", (req, res) => {
   const templateVars = {
     user,
   };
+  // If user is already logged in and they try to access login page, redirect them to /urls
   if (user) {
     res.redirect("/urls");
   } else {
@@ -99,20 +109,23 @@ app.get("/urls", (req, res) => {
 
 // Login and create cookie
 app.post("/login", (req, res) => {
-  for (let userID in users) {
-    // If the email does not exist, return error 
-    if (users[userID]["email"] !== req.body.email) {
-      return res.status(403).send("Email address does not exist.");
-    }
-    // If the email exists but the password is incorrect, return error
-    if (users[userID]["email"] === req.body.email && users[userID]["password"] !== req.body.password) {
-      return res.status(403).send("Password is incorrect.");
-    }
-    // If the email exists and the password is correct, create a user_id cookie and redirect to My URLs page
-    if (users[userID]["email"] === req.body.email && users[userID]["password"] === req.body.password) {
-      res.cookie('user_id', userID);
-      res.redirect("/urls");
-    }
+
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = getUserByEmail(email);
+
+  // If the email does not exist, return error 
+  if (!user) {
+    return res.status(403).send("Email address does not exist.");
+  }
+  // If the email exists but the password is incorrect, return error
+  if (user && password !== user.password) {
+    return res.status(403).send("Password is incorrect.");
+  }
+  // If the email exists and the password is correct, create a user_id cookie and redirect to My URLs page
+  if (user && password === user.password) {
+    res.cookie('user_id', user.id);
+    res.redirect("/urls");
   }
 });
 
@@ -128,6 +141,7 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user,
   };
+  // If user is not logged in, redirect them to the login page
   if (!user) {
     res.redirect("/login");
   } else {
@@ -138,6 +152,7 @@ app.get("/urls/new", (req, res) => {
 // Generate short URL and redirect to short URL page
 app.post("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  // If user is not logged in, return status code 401 - Unauthorized
   if (!user) {
     return res.status(401).send("You must be logged in to see this page");
   } else {
@@ -160,8 +175,13 @@ app.get("/urls/:id", (req, res) => {
 
 // Use short URL to redirect to corresponding long URL webpage
 app.get("/u/:id", (req, res) => {
-  const longURL = urlDatabase[`${req.params.id}`];
-  res.redirect(longURL);
+  // If short URL does not exist, return status code 400 - Bad Request
+  if (!req.params.id) {
+    res.status(400).send("Short URL does not exist");
+  } else {
+    const longURL = urlDatabase[`${req.params.id}`];
+    res.redirect(longURL);
+  }
 });
 
 // Update short URL to correspond to a different long URL
