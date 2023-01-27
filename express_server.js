@@ -44,6 +44,7 @@ app.get("/register", (req, res) => {
   res.render("user_registration");
 });
 
+// Register new user and store in users object
 app.post("/register", (req, res) => {
   // If either the email or password input is empty, return error 400
   if (!req.body.email || !req.body.password) {
@@ -63,6 +64,11 @@ app.post("/register", (req, res) => {
   users[userID]["password"] = req.body.password;
   res.cookie('user_id', userID);
   res.redirect("/urls");
+});
+
+// Get /login -> User login page
+app.get("/login", (req, res) => {
+  res.render("user_login");
 });
 
 // Get /urls -> My URLs page
