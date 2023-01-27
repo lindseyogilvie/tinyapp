@@ -15,6 +15,9 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 8);
 }
 
+// Users database object
+const users = {};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -28,6 +31,16 @@ app.get("/", (req, res) => {
 // Get /register -> New user registration page
 app.get("/register", (req, res) => {
   res.render("user_registration");
+});
+
+app.post("/register", (req, res) => {
+  const userID = generateRandomString();
+  users[userID] = {};
+  users[userID]["id"] = userID;
+  users[userID]["email"] = req.body.email;
+  users[userID]["password"] = req.body.password;
+  res.cookie('user_id', userID); 
+  res.redirect("/urls")
 });
 
 // Get /urls -> My URLs page
