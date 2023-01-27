@@ -25,6 +25,11 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// Get /register -> New user registration page
+app.get("/register", (req, res) => {
+  res.render("user_registration");
+});
+
 // Get /urls -> My URLs page
 app.get("/urls", (req, res) => {
   const templateVars = { 
