@@ -83,9 +83,21 @@ app.get("/urls", (req, res) => {
 
 // Create cookie to save login username
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect("/urls");
+  for (let userID in users) {
+    // If the email does not exist, return error 
+    if (users[userID]["email"] !== req.body.email) {
+      return res.status(403).send("Email address does not exist.");
+    }
+    // If the email exists but the password is incorrect, return error
+    if (users[userID]["email"] === req.body.email && users[userID]["password"] !== req.body.password) {
+      return res.status(403).send("Password is incorrect.");
+    }
+    // If the email exists and the password is correct, create a user_id cookie and redirect to My URLs page
+    if (users[userID]["email"] === req.body.email && users[userID]["password"] === req.body.password) {
+      res.cookie('user_id', userID);
+      res.redirect("/urls");
+    }
+  }
 });
 
 // Logout and clear username cookie
