@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const PORT = 8080; //default port 8080
 
 // Configuration
@@ -96,10 +97,14 @@ app.post("/register", (req, res) => {
   }
 
   const userID = generateRandomString();
+  const email = req.body.email
+  const password = req.body.password
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  
   users[userID] = {};
   users[userID]["id"] = userID;
-  users[userID]["email"] = req.body.email;
-  users[userID]["password"] = req.body.password;
+  users[userID]["email"] = email;
+  users[userID]["password"] = hashedPassword;
   res.cookie('user_id', userID);
   res.redirect("/urls");
 });
@@ -222,7 +227,7 @@ app.post("/urls/:id", (req, res) => {
   if (!urlDatabase[id]) {
     return res.status(400).send("This url does not exist.")
   }
-  
+
   const user = users[req.cookies["user_id"]];
   const urlUserID = urlDatabase[req.params.id].userID;
   if (!user) {
