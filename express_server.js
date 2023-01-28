@@ -54,6 +54,7 @@ const urlDatabase = {
   },
 };
 
+// Function returns short urls associated with a user's individual id
 const urlsForUser = function(id) {
   const userUrls = {};
   for (const urls in urlDatabase) {
@@ -64,11 +65,6 @@ const urlsForUser = function(id) {
   }
   return userUrls;
 };
-
-// Get /
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
 
 // Get /register -> New user registration page
 app.get("/register", (req, res) => {
@@ -264,14 +260,6 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</></bod></html>\n");
-});
-
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
