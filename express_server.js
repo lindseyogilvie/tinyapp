@@ -22,8 +22,8 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
-  user2RandomID: {
-    id: "user2RandomID",
+  aJ48lU: {
+    id: "aJ48lU",
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
@@ -121,27 +121,25 @@ app.get("/login", (req, res) => {
 // Get /urls -> My URLs page
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  // User cannot see /urls page unless they are logged in
+  if (!user) {
+    return res.status(401).send("Please login to see urls");
+  }
   const userUrls = urlsForUser(user.id);
   const templateVars = {
     urls: userUrls,
     user,
   };
-  // User cannot see /urls page unless they are logged in
-  if (!user) {
-    return res.status(401).send("Please login to see urls");
-  }
-
   res.render("urls_index", templateVars);
 });
 
 // Login and create cookie
 app.post("/login", (req, res) => {
-
   const email = req.body.email;
   const password = req.body.password;
   const user = getUserByEmail(email);
 
-  // If the email does not exist, return error 
+  // If the email does not exist, return error
   if (!user) {
     return res.status(403).send("Email address does not exist.");
   }
@@ -192,12 +190,20 @@ app.post("/urls", (req, res) => {
 // Get /urls/:id -> short URL page
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
+  const urlUserID = urlDatabase[req.params.id].userID;
+  console.log(urlUserID);
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user,
   };
-  res.render("urls_show", templateVars);
+  if (!user) {
+    return res.status(401).send("You must be logged in to see this page.");
+  } else if (user.id !== urlUserID) {
+    return res.status(401).send("You can only view your own urls.");
+  } else {
+    res.render("urls_show", templateVars);
+  }
 });
 
 // Use short URL to redirect to corresponding long URL webpage
