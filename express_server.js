@@ -94,7 +94,6 @@ app.post("/register", (req, res) => {
   // If someone tries to register with an existing email address, return error 400
   for (let userID in users) {
     if (getUserByEmail(userEmail, users)) {
-    // if (users[userID]["email"] === req.body.email) {
       return res.status(400).send("Email is already in use.");
     }
   }
