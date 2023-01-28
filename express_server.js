@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const PORT = 8080; //default port 8080
 
@@ -9,7 +9,13 @@ app.set("view engine", "ejs");
 
 // Middleware
 app.use(express.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['Key 1', 'Key 2'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 // Function generates random string consisting of 6 alphanumeric characters
 const generateRandomString = function() {
@@ -72,7 +78,7 @@ app.get("/", (req, res) => {
 
 // Get /register -> New user registration page
 app.get("/register", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
     user,
   };
@@ -105,13 +111,13 @@ app.post("/register", (req, res) => {
   users[userID]["id"] = userID;
   users[userID]["email"] = email;
   users[userID]["password"] = hashedPassword;
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
 // Get /login -> User login page
 app.get("/login", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
     user,
   };
@@ -125,7 +131,7 @@ app.get("/login", (req, res) => {
 
 // Get /urls -> My URLs page
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   // User cannot see /urls page unless they are logged in
   if (!user) {
     return res.status(401).send("Please login to see urls");
@@ -154,20 +160,20 @@ app.post("/login", (req, res) => {
   }
   // If the email exists and the password is correct, create a user_id cookie and redirect to My URLs page
   if (user && bcrypt.compareSync(password, user.password) === true) {
-    res.cookie('user_id', user.id);
+    req.session.user_id = user.id;
     res.redirect("/urls");
   }
 });
 
 // Logout and clear user_id cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/login");
 });
 
 // Get /urls/new -> New Short URL page
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const templateVars = {
     user,
   };
@@ -181,7 +187,7 @@ app.get("/urls/new", (req, res) => {
 
 // Generate short URL and redirect to short URL page
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   // If user is not logged in, return status code 401 - Unauthorized
   if (!user) {
     return res.status(401).send("You must be logged in to see this page");
@@ -194,7 +200,7 @@ app.post("/urls", (req, res) => {
 
 // Get /urls/:id -> short URL page
 app.get("/urls/:id", (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const urlUserID = urlDatabase[req.params.id].userID;
   const templateVars = {
     id: req.params.id,
@@ -228,7 +234,7 @@ app.post("/urls/:id", (req, res) => {
     return res.status(400).send("This url does not exist.");
   }
 
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const urlUserID = urlDatabase[req.params.id].userID;
   if (!user) {
     return res.status(401).send("You must be logged in to edit this url.");
@@ -247,7 +253,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.status(400).send("This url does not exist.");
   }
 
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.session.user_id];
   const urlUserID = urlDatabase[req.params.id].userID;
   if (!user) {
     return res.status(401).send("You must be logged in to delete this url.");
