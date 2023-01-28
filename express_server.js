@@ -25,7 +25,7 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 8);
 };
 
-// Users database object
+// Users Database
 const users = {
   aJ48lW: {
     id: "aJ48lW",
