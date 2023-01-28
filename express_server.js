@@ -193,7 +193,10 @@ app.post("/urls", (req, res) => {
     return res.status(401).send("You must be logged in to see this page");
   } else {
     const shortURL = generateRandomString();
-    urlDatabase[shortURL].longURL = req.body.longURL;
+    const longURL = req.body.longURL;
+    const userID = user.id;
+ 
+    urlDatabase[shortURL] = {longURL, userID};
     res.redirect(302, `/urls/${shortURL}`);
   }
 });
