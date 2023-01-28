@@ -191,7 +191,6 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const urlUserID = urlDatabase[req.params.id].userID;
-  console.log(urlUserID);
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
@@ -220,14 +219,39 @@ app.get("/u/:id", (req, res) => {
 // Update short URL to correspond to a different long URL
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
-  urlDatabase[id].longURL = req.body.longURL;
-  res.redirect("/urls");
+  if (!urlDatabase[id]) {
+    return res.status(400).send("This url does not exist.")
+  }
+  
+  const user = users[req.cookies["user_id"]];
+  const urlUserID = urlDatabase[req.params.id].userID;
+  if (!user) {
+    return res.status(401).send("You must be logged in to edit this url.");
+  } else if (user.id !== urlUserID) {
+    return res.status(401).send("You can only edit your own urls.");
+  } else {
+    urlDatabase[id].longURL = req.body.longURL;
+    res.redirect("/urls");
+  }
 });
 
 // Delete short URL
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect("/urls");
+  const id = req.params.id;
+  if (!urlDatabase[id]) {
+    return res.status(400).send("This url does not exist.")
+  }
+
+  const user = users[req.cookies["user_id"]];
+  const urlUserID = urlDatabase[req.params.id].userID;
+  if (!user) {
+    return res.status(401).send("You must be logged in to delete this url.");
+  } else if (user.id !== urlUserID) {
+    return res.status(401).send("You can only delete your own urls.");
+} else {
+    delete urlDatabase[req.params.id];
+    res.redirect("/urls");
+  }
 });
 
 app.get("/urls.json", (req, res) => {
