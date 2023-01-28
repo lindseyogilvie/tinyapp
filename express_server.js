@@ -17,6 +17,9 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
+// Helper Functions
+const getUserByEmail = require('./helpers');
+
 // Function generates random string consisting of 6 alphanumeric characters
 const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 8);
@@ -34,15 +37,6 @@ const users = {
     email: "user2@example.com",
     password: bcrypt.hashSync("dishwasher-funk", 10),
   },
-};
-
-const getUserByEmail = function(email) {
-  for (const id in users) {
-    const user = users[id];
-    if (user.email === email) {
-      return user;
-    }
-  }
 };
 
 const urlDatabase = {
@@ -91,13 +85,16 @@ app.get("/register", (req, res) => {
 
 // Register new user and store in users object
 app.post("/register", (req, res) => {
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
   // If either the email or password input is empty, return error 400
-  if (!req.body.email || !req.body.password) {
+  if (!userEmail || !userPassword) {
     return res.status(400).send("Please provide an email and a password.");
   }
   // If someone tries to register with an existing email address, return error 400
   for (let userID in users) {
-    if (users[userID]["email"] === req.body.email) {
+    if (getUserByEmail(userEmail, users)) {
+    // if (users[userID]["email"] === req.body.email) {
       return res.status(400).send("Email is already in use.");
     }
   }
@@ -148,7 +145,7 @@ app.get("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   // If the email does not exist, return error
   if (!user) {
