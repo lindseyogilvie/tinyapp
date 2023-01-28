@@ -21,12 +21,12 @@ const users = {
   aJ48lW: {
     id: "aJ48lW",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10),
   },
   aJ48lU: {
     id: "aJ48lU",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("dishwasher-funk", 10),
   },
 };
 
@@ -97,10 +97,10 @@ app.post("/register", (req, res) => {
   }
 
   const userID = generateRandomString();
-  const email = req.body.email
-  const password = req.body.password
+  const email = req.body.email;
+  const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  
+
   users[userID] = {};
   users[userID]["id"] = userID;
   users[userID]["email"] = email;
@@ -149,11 +149,11 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Email address does not exist.");
   }
   // If the email exists but the password is incorrect, return error
-  if (user && password !== user.password) {
+  if (user && bcrypt.compareSync(password, user.password) === false) {
     return res.status(403).send("Password is incorrect.");
   }
   // If the email exists and the password is correct, create a user_id cookie and redirect to My URLs page
-  if (user && password === user.password) {
+  if (user && bcrypt.compareSync(password, user.password) === true) {
     res.cookie('user_id', user.id);
     res.redirect("/urls");
   }
@@ -225,7 +225,7 @@ app.get("/u/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id;
   if (!urlDatabase[id]) {
-    return res.status(400).send("This url does not exist.")
+    return res.status(400).send("This url does not exist.");
   }
 
   const user = users[req.cookies["user_id"]];
@@ -244,7 +244,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   if (!urlDatabase[id]) {
-    return res.status(400).send("This url does not exist.")
+    return res.status(400).send("This url does not exist.");
   }
 
   const user = users[req.cookies["user_id"]];
@@ -253,7 +253,7 @@ app.post("/urls/:id/delete", (req, res) => {
     return res.status(401).send("You must be logged in to delete this url.");
   } else if (user.id !== urlUserID) {
     return res.status(401).send("You can only delete your own urls.");
-} else {
+  } else {
     delete urlDatabase[req.params.id];
     res.redirect("/urls");
   }
